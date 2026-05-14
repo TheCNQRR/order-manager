@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RegisterUserEventProducer {
 
-    private final KafkaTemplate<String, UserRegisterEvent> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Value("${kafka.topics.register-user}")
     private String topic;

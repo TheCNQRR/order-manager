@@ -3,6 +3,7 @@ package by.java.enterprise.userservice.config;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -16,9 +17,28 @@ import java.util.Map;
 @Configuration
 public class KafkaConfig {
 
+    @Value("${kafka.topics.register-user}")
+    private String userCreatedTopic;
+
+    @Value("${kafka.topics.update-user}")
+    private String userUpdatedTopic;
+
+    @Value("${kafka.topics.delete-user}")
+    private String userDeletedTopic;
+
     @Bean
     public NewTopic userRegisteredTopic() {
-        return new NewTopic("user-registered", 1, (short) 1);
+        return new NewTopic(userCreatedTopic, 1, (short) 1);
+    }
+
+    @Bean
+    public NewTopic userUpdatedTopic() {
+        return new NewTopic(userUpdatedTopic, 1, (short) 1);
+    }
+
+    @Bean
+    public NewTopic userDeletedTopic() {
+        return new NewTopic(userDeletedTopic, 1, (short) 1);
     }
 
     @Bean
