@@ -17,13 +17,13 @@ import java.util.Map;
 @Configuration
 public class KafkaConfig {
 
-    @Value("${kafka.topics.register-user}")
+    @Value("${kafka.topics.user-created}")
     private String userCreatedTopic;
 
-    @Value("${kafka.topics.update-user}")
+    @Value("${kafka.topics.user-updated}")
     private String userUpdatedTopic;
 
-    @Value("${kafka.topics.delete-user}")
+    @Value("${kafka.topics.user-deleted}")
     private String userDeletedTopic;
 
     @Bean

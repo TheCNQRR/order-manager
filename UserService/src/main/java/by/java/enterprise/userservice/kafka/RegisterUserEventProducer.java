@@ -14,10 +14,10 @@ public class RegisterUserEventProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    @Value("${kafka.topics.register-user}")
+    @Value("${kafka.topics.user-created}")
     private String topic;
 
-    public void registerUserEvent(User user) {
+    public void sendCreateUserEvent(User user) {
         try {
             UserRegisterEvent event = new UserRegisterEvent(
                     user.getId(),
@@ -32,7 +32,7 @@ public class RegisterUserEventProducer {
             kafkaTemplate.send(topic, event)
                     .whenComplete((result, e) -> {
                         if (e == null) {
-                            log.info("register user event sent successfully: id={}, email={}, firstName={}, lastName={}, phone={}, role={}, registeredAt={}",
+                            log.info("create user event sent successfully: id={}, email={}, firstName={}, lastName={}, phone={}, role={}, registeredAt={}",
                                     user.getId(),
                                     user.getEmail(),
                                     user.getFirstName(),
@@ -41,11 +41,11 @@ public class RegisterUserEventProducer {
                                     user.getUserRole(),
                                     user.getRegisteredAt());
                         } else {
-                            log.error("failed to send register user event: id={}, error={}", user.getId(), e.getMessage());
+                            log.error("failed to send create user event: id={}, error={}", user.getId(), e.getMessage());
                         }
                     });
         } catch (Exception e) {
-            log.error("Unexpected error while sending register user event: id={}, error={}", user.getId(), e.getMessage());
+            log.error("unexpected error while sending create user event: id={}, error={}", user.getId(), e.getMessage());
         }
     }
 }

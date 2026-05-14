@@ -4,13 +4,7 @@ import by.java.enterprise.userservice.entity.UserRole;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 
-import java.util.UUID;
-
 public record CreateUserRequest(
-        @JsonProperty("id")
-        @NotNull(message = "id must be not null")
-        UUID id,
-
         @JsonProperty("email")
         @NotBlank(message = "email must be not null")
         @Email(message = "email must be valid")
@@ -37,8 +31,7 @@ public record CreateUserRequest(
         String phone,
 
         @JsonProperty("role")
-        @NotBlank(message = "role must be not null")
-        @Pattern(regexp = "^(CUSTOMER|ADMIN|SUPPORT)$", message = "Role must be one of: CUSTOMER, ADMIN, SUPPORT")
+        @NotNull(message = "role must be not null")
         UserRole role
 ) {
 }
