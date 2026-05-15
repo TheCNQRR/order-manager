@@ -2,6 +2,7 @@ package by.java.enterprise.userservice.controller;
 
 import by.java.enterprise.userservice.dto.request.CreateUserRequest;
 import by.java.enterprise.userservice.dto.request.LoginRequest;
+import by.java.enterprise.userservice.dto.request.UpdateUserRequest;
 import by.java.enterprise.userservice.dto.response.*;
 import by.java.enterprise.userservice.entity.AuthStatus;
 import by.java.enterprise.userservice.service.UserService;
@@ -11,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -38,13 +38,37 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@RequestHeader("Authorization") String token, @PathVariable UUID id) {
+    public ResponseEntity<?> getUserById(@RequestHeader("Authorization") String token, @PathVariable UUID id) {
         GetUserResponse result = userService.findById(token, id);
 
         return result.errorMessage() == null ?
                 ResponseEntity.status(HttpStatus.OK).body(result.user()) :
                 result.errorMessage().equals("access denied") ?
-                        ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(result.errorMessage())) :
+                        ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(result.errorMessage())) :
                         ResponseEntity.status(HttpStatus.NOT_FOUND).body(result.errorMessage());
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllUsers(@RequestHeader("Authorization") String token) {
+        GetAllUsersResponse result = userService.findAll(token);
+
+        return result.errorMessage() == null ?
+                ResponseEntity.status(HttpStatus.OK).body(result.users()) :
+                ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(result.errorMessage()));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String token,
+                                        @PathVariable UUID id,
+                                        @RequestBody UpdateUserRequest request) {
+        UpdateUserResponse result = userService.updateUser(token, id, request);
+
+        return result.errorMessage() == null ?
+                ResponseEntity.status(HttpStatus.OK).body(result.user()) :
+                result.errorMessage().equals("access denied") ?
+                        ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(result.errorMessage())) :
+                        result.errorMessage().contains("doesn't exists") ?
+                                ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(result.errorMessage())) :
+                                ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(result.errorMessage()));
     }
 }
