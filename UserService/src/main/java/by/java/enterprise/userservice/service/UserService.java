@@ -8,6 +8,7 @@ import by.java.enterprise.userservice.entity.AuthStatus;
 import by.java.enterprise.userservice.entity.User;
 import by.java.enterprise.userservice.entity.UserRole;
 import by.java.enterprise.userservice.kafka.RegisterUserEventProducer;
+import by.java.enterprise.userservice.kafka.UpdateUserEventProducer;
 import by.java.enterprise.userservice.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RegisterUserEventProducer registerUserEventProducer;
+    private final UpdateUserEventProducer updateUserEventProducer;
     private final JwtService jwtService;
 
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -159,6 +161,7 @@ public class UserService {
         }
 
         userRepository.save(user);
+        updateUserEventProducer.sendUpdateUserEvent(user);
         UserResponse userResponse = mapToResponse(user);
 
         return new UpdateUserResponse(userResponse, null);
