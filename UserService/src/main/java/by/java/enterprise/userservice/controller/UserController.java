@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -70,5 +71,13 @@ public class UserController {
                         result.errorMessage().contains("doesn't exists") ?
                                 ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(result.errorMessage())) :
                                 ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(result.errorMessage()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") String token, @PathVariable UUID id) {
+        Optional<String> result = userService.deleteUser(token, id);
+
+        return result.isEmpty() ? ResponseEntity.status(HttpStatus.NO_CONTENT).build() :
+                ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(result.get()));
     }
 }

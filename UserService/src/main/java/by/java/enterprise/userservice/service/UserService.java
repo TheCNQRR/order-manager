@@ -7,6 +7,7 @@ import by.java.enterprise.userservice.dto.response.*;
 import by.java.enterprise.userservice.entity.AuthStatus;
 import by.java.enterprise.userservice.entity.User;
 import by.java.enterprise.userservice.entity.UserRole;
+import by.java.enterprise.userservice.kafka.DeleteUserEventProducer;
 import by.java.enterprise.userservice.kafka.RegisterUserEventProducer;
 import by.java.enterprise.userservice.kafka.UpdateUserEventProducer;
 import by.java.enterprise.userservice.repository.UserRepository;
@@ -28,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RegisterUserEventProducer registerUserEventProducer;
     private final UpdateUserEventProducer updateUserEventProducer;
+    private final DeleteUserEventProducer deleteUserEventProducer;
     private final JwtService jwtService;
 
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -165,6 +167,25 @@ public class UserService {
         UserResponse userResponse = mapToResponse(user);
 
         return new UpdateUserResponse(userResponse, null);
+    }
+
+    public Optional<String> deleteUser(String token, UUID targetId) {
+        String role = jwtService.parseToken(token).get("role", String.class);
+
+        if (!role.equals(UserRole.ADMIN.toString())) {
+            return Optional.of("you don't have permission to delete profile");
+        }
+
+        Optional<User> userResult = userRepository.findById(targetId);
+        if (userResult.isEmpty()) {
+            return Optional.empty();
+        }
+
+
+        userRepository.delete(userResult.get());
+        deleteUserEventProducer.sendDeleteUserEvent(targetId);
+
+        return Optional.empty();
     }
 
     private UserResponse mapToResponse(User user) {
