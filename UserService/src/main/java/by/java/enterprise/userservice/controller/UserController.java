@@ -2,19 +2,17 @@ package by.java.enterprise.userservice.controller;
 
 import by.java.enterprise.userservice.dto.request.CreateUserRequest;
 import by.java.enterprise.userservice.dto.request.LoginRequest;
-import by.java.enterprise.userservice.dto.response.AuthResult;
-import by.java.enterprise.userservice.dto.response.LoginResponse;
-import by.java.enterprise.userservice.dto.response.UserResponse;
+import by.java.enterprise.userservice.dto.response.*;
 import by.java.enterprise.userservice.entity.AuthStatus;
 import by.java.enterprise.userservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -31,11 +29,22 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         AuthResult result = userService.login(request);
 
         return result.status() == AuthStatus.SUCCESS ?
-                ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(result.token(), null)) :
-                ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse(null, result.errorMessage()));
+                ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(result.token())) :
+                ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(result.errorMessage()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@RequestHeader("Authorization") String token, @PathVariable UUID id) {
+        GetUserResponse result = userService.findById(token, id);
+
+        return result.errorMessage() == null ?
+                ResponseEntity.status(HttpStatus.OK).body(result.user()) :
+                result.errorMessage().equals("access denied") ?
+                        ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(result.errorMessage())) :
+                        ResponseEntity.status(HttpStatus.NOT_FOUND).body(result.errorMessage());
     }
 }

@@ -2,8 +2,8 @@ package by.java.enterprise.userservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record LoginResponse(
-        @JsonProperty("token")
-        String token
+public record ErrorResponse(
+        @JsonProperty("error")
+        String errorMessage
 ) {
 }
