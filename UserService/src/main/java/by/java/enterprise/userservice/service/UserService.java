@@ -156,7 +156,7 @@ public class UserService {
             if (userRole.equals(UserRole.ADMIN.toString()) && !user.getUserRole().equals(UserRole.ADMIN)) {
                 user.setUserRole(request.role());
             } else if (user.getUserRole().equals(UserRole.ADMIN)) {
-                return new UpdateUserResponse(null, "user has ADMIN role,  you can't change it");
+                return new UpdateUserResponse(null, "user has ADMIN role, you can't change it");
             } else {
                 return new UpdateUserResponse(null, "you don't have permission to change roles");
             }
