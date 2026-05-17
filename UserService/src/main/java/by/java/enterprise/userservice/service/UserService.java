@@ -1,5 +1,6 @@
 package by.java.enterprise.userservice.service;
 
+import by.java.enterprise.jwtservice.service.JwtService;
 import by.java.enterprise.userservice.dto.request.CreateUserRequest;
 import by.java.enterprise.userservice.dto.request.LoginRequest;
 import by.java.enterprise.userservice.dto.request.UpdateUserRequest;

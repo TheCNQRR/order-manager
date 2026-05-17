@@ -23,23 +23,19 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+        String token = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
+        if (jwtService.validateToken(token)) {
+            try {
+                Claims claims = jwtService.parseToken(token);
 
-            if (jwtService.validateToken(token)) {
-                try {
-                    Claims claims = jwtService.parseToken(token);
+                UUID userId = UUID.fromString(claims.get("id", String.class));
+                String role = claims.get("role", String.class);
 
-                    UUID userId = UUID.fromString(claims.get("id", String.class));
-                    String role = claims.get("role", String.class);
-
-                    UserContext.setUserId(userId);
-                    UserContext.setUserRole(role);
-                } catch (Exception e) {
-                    log.error("failed to parse JWT token: {}", e.getMessage());
-                }
+                UserContext.setUserId(userId);
+                UserContext.setUserRole(role);
+            } catch (Exception e) {
+                log.error("failed to parse JWT token: {}", e.getMessage());
             }
         }
 

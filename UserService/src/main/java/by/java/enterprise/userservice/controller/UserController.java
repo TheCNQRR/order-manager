@@ -1,5 +1,6 @@
 package by.java.enterprise.userservice.controller;
 
+import by.java.enterprise.jwtservice.annotation.RequiredRole;
 import by.java.enterprise.userservice.dto.request.CreateUserRequest;
 import by.java.enterprise.userservice.dto.request.LoginRequest;
 import by.java.enterprise.userservice.dto.request.UpdateUserRequest;
@@ -39,6 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @RequiredRole({"ADMIN"})
     public ResponseEntity<?> getUserById(@RequestHeader("Authorization") String token, @PathVariable UUID id) {
         GetUserResponse result = userService.findById(token, id);
 

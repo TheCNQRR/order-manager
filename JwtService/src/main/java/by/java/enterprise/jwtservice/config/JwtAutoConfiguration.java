@@ -20,8 +20,9 @@ public class JwtAutoConfiguration  implements WebMvcConfigurer {
 
     @Bean
     @ConditionalOnMissingBean
-    public JwtService jwtService(@Value("${jwt.secret}") String secret) {
-        return new JwtService(secret);
+    public JwtService jwtService(@Value("${jwt.secret}") String secret,
+                                 @Value("${jwt.expiration-ms}") long expirationMs) {
+        return new JwtService(secret, expirationMs);
     }
 
     @Bean
