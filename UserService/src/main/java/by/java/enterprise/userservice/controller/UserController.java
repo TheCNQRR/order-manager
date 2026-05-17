@@ -1,5 +1,7 @@
 package by.java.enterprise.userservice.controller;
 
+import by.java.enterprise.jwtservice.annotation.CurrentUserId;
+import by.java.enterprise.jwtservice.annotation.CurrentUserRole;
 import by.java.enterprise.jwtservice.annotation.RequiredRole;
 import by.java.enterprise.userservice.dto.request.CreateUserRequest;
 import by.java.enterprise.userservice.dto.request.LoginRequest;
@@ -40,9 +42,11 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @RequiredRole({"ADMIN"})
-    public ResponseEntity<?> getUserById(@RequestHeader("Authorization") String token, @PathVariable UUID id) {
-        GetUserResponse result = userService.findById(token, id);
+    @RequiredRole({"ADMIN", "SUPPORT", "CUSTOMER"})
+    public ResponseEntity<?> getUserById(@CurrentUserId UUID userId,
+                                         @CurrentUserRole String userRole,
+                                         @PathVariable("id") UUID targetId) {
+        GetUserResponse result = userService.findById(userId, userRole, targetId);
 
         return result.errorMessage() == null ?
                 ResponseEntity.status(HttpStatus.OK).body(result.user()) :

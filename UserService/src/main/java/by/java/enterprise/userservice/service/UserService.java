@@ -70,22 +70,16 @@ public class UserService {
         return new AuthResult(AuthStatus.SUCCESS, token, null);
     }
 
-    public GetUserResponse findById(String token, UUID targetId) {
-        Claims claims = jwtService.parseToken(token);
-        UUID userId = UUID.fromString(claims.get("id", String.class));
-        String role = claims.get("role", String.class);
-
-        boolean access;
-        if (role.equals(UserRole.ADMIN.toString()) || role.equals(UserRole.SUPPORT.toString())) {
-            access = true;
-        } else if (role.equals(UserRole.CUSTOMER.toString())) {
-            access = userId.equals(targetId);
-        } else {
-            access = false;
+    public GetUserResponse findById(UUID userId, String userRole, UUID targetId) {
+        boolean access = true;
+        if (userRole.equals(UserRole.CUSTOMER.toString())) {
+            if (!userId.equals(targetId)) {
+                access = false;
+            }
         }
 
         if (!access) {
-            return new GetUserResponse(null, "access denied");
+            return new GetUserResponse(null, "you can't view other profiles");
         }
 
         Optional<User> userResult = userRepository.findById(targetId);
