@@ -70,6 +70,18 @@ public class UserService {
         return new AuthResult(AuthStatus.SUCCESS, token, null);
     }
 
+    public GetUserResponse getMe(UUID id) {
+        Optional<User> userResult = userRepository.findById(id);
+
+        if (userResult.isEmpty()) {
+            return new GetUserResponse(null, "user with id = {" + id + "} doesn't exists");
+        }
+
+        UserResponse user = mapToResponse(userResult.get());
+
+        return new GetUserResponse(user, null);
+    }
+
     public GetUserResponse findById(UUID userId, String userRole, UUID targetId) {
         boolean access = true;
         if (userRole.equals(UserRole.CUSTOMER.toString())) {
@@ -89,13 +101,7 @@ public class UserService {
                 .orElseGet(() -> new GetUserResponse(null, "user with id = {" + targetId + "} doesn't exists"));
     }
 
-    public GetAllUsersResponse findAll(String token) {
-        String role = jwtService.parseToken(token).get("role", String.class);
-
-        if (!role.equals(UserRole.ADMIN.toString())) {
-            return new GetAllUsersResponse(null, "access denied");
-        }
-
+    public GetAllUsersResponse findAll() {
         List<User> users = userRepository.findAll();
         List<UserResponse> userResponses = users.stream()
                 .map(this::mapToResponse)
@@ -105,10 +111,7 @@ public class UserService {
     }
 
 
-    public UpdateUserResponse updateUser(String token, UUID targetId, UpdateUserRequest request) {
-        UUID userId = UUID.fromString(jwtService.parseToken(token).get("id", String.class));
-        String userRole = jwtService.parseToken(token).get("role", String.class);
-
+    public UpdateUserResponse updateUser(UUID userId, String userRole, UUID targetId, UpdateUserRequest request) {
         if (!userId.equals(targetId) && !userRole.equals(UserRole.ADMIN.toString())) {
             return new UpdateUserResponse(null, "access denied");
         }
@@ -164,13 +167,7 @@ public class UserService {
         return new UpdateUserResponse(userResponse, null);
     }
 
-    public Optional<String> deleteUser(String token, UUID targetId) {
-        String role = jwtService.parseToken(token).get("role", String.class);
-
-        if (!role.equals(UserRole.ADMIN.toString())) {
-            return Optional.of("you don't have permission to delete profile");
-        }
-
+    public Optional<String> deleteUser(UUID targetId) {
         Optional<User> userResult = userRepository.findById(targetId);
         if (userResult.isEmpty()) {
             return Optional.empty();

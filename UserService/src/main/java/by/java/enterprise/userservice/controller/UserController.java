@@ -41,6 +41,15 @@ public class UserController {
                 ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(result.errorMessage()));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe(@CurrentUserId UUID id) {
+        GetUserResponse result = userService.getMe(id);
+
+        return result.errorMessage() == null ?
+                ResponseEntity.status(HttpStatus.OK).body(result.user()) :
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body(result.errorMessage());
+    }
+
     @GetMapping("/{id}")
     @RequiredRole({"ADMIN", "SUPPORT", "CUSTOMER"})
     public ResponseEntity<?> getUserById(@CurrentUserId UUID userId,
@@ -56,8 +65,9 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllUsers(@RequestHeader("Authorization") String token) {
-        GetAllUsersResponse result = userService.findAll(token);
+    @RequiredRole({"ADMIN"})
+    public ResponseEntity<?> getAllUsers() {
+        GetAllUsersResponse result = userService.findAll();
 
         return result.errorMessage() == null ?
                 ResponseEntity.status(HttpStatus.OK).body(result.users()) :
@@ -65,10 +75,11 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String token,
+    public ResponseEntity<?> updateUser(@CurrentUserId UUID userId,
+                                        @CurrentUserRole String userRole,
                                         @PathVariable UUID id,
                                         @RequestBody UpdateUserRequest request) {
-        UpdateUserResponse result = userService.updateUser(token, id, request);
+        UpdateUserResponse result = userService.updateUser(userId, userRole, id, request);
 
         return result.errorMessage() == null ?
                 ResponseEntity.status(HttpStatus.OK).body(result.user()) :
@@ -80,8 +91,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") String token, @PathVariable UUID id) {
-        Optional<String> result = userService.deleteUser(token, id);
+    @RequiredRole({"ADMIN"})
+    public ResponseEntity<?> deleteUser(@PathVariable UUID id) {
+        Optional<String> result = userService.deleteUser(id);
 
         return result.isEmpty() ? ResponseEntity.status(HttpStatus.NO_CONTENT).build() :
                 ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(result.get()));
