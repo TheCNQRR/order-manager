@@ -7,22 +7,37 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.46/a5cfe99fdf320e84955ef653f2ce1bf789d11385/lombok-1.18.46.jar" />
         </processorPath>
-        <module name="PaymentService.main" />
-        <module name="PaymentService.test" />
+        <module name="OrderManager.PaymentService.main" />
+        <module name="OrderManager.UserService.main" />
+        <module name="OrderManager.JwtService.main" />
+        <module name="OrderManager.OrderService.test" />
+        <module name="OrderManager.InventoryService.main" />
+        <module name="OrderManager.OrderService.main" />
+        <module name="OrderManager.InventoryService.test" />
+        <module name="OrderManager.JwtService.test" />
+        <module name="OrderManager.UserService.test" />
+        <module name="OrderManager.PaymentService.test" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="21" />
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="InventoryService" options="-parameters" />
-      <module name="InventoryService.main" options="-parameters" />
-      <module name="InventoryService.test" options="-parameters" />
-      <module name="OrderService" options="-parameters" />
-      <module name="OrderService.main" options="-parameters" />
-      <module name="OrderService.test" options="-parameters" />
-      <module name="PaymentService" options="-parameters" />
-      <module name="PaymentService.main" options="-parameters" />
-      <module name="PaymentService.test" options="-parameters" />
+      <module name="OrderManager.InventoryService" options="-parameters" />
+      <module name="OrderManager.InventoryService.main" options="-parameters" />
+      <module name="OrderManager.InventoryService.test" options="-parameters" />
+      <module name="OrderManager.JwtService" options="-parameters" />
+      <module name="OrderManager.JwtService.main" options="-parameters" />
+      <module name="OrderManager.JwtService.test" options="-parameters" />
+      <module name="OrderManager.OrderService" options="-parameters" />
+      <module name="OrderManager.OrderService.main" options="-parameters" />
+      <module name="OrderManager.OrderService.test" options="-parameters" />
+      <module name="OrderManager.PaymentService" options="-parameters" />
+      <module name="OrderManager.PaymentService.main" options="-parameters" />
+      <module name="OrderManager.PaymentService.test" options="-parameters" />
+      <module name="OrderManager.UserService" options="-parameters" />
+      <module name="OrderManager.UserService.main" options="-parameters" />
+      <module name="OrderManager.UserService.test" options="-parameters" />
     </option>
   </component>
 </project>
